@@ -10,29 +10,25 @@ var CSSUrlString = require('./lib/CssUrlString');
 var hashStore = new HashStore();
 
 module.exports = postcss.plugin('postcss-url-hash', function (options) {
-  var self = this;
-  self.store = {};
-  self.options = options || {};
+  options = options || {};
 
-  self.options.baseUrl = self.options.baseUrl || '/';
+  options.baseUrl = options.baseUrl || '/';
 
-  if (self.options.basePath) {
+  if (options.basePath) {
     // Convert the provided base path to an absolute form
-    self.options.basePath = path.resolve(self.options.basePath);
+    options.basePath = path.resolve(options.basePath);
   } else {
     // Set to an absolute path to the working directory
-    self.options.basePath = process.cwd();
+    options.basePath = process.cwd();
   }
 
-
-  self.resolveDataUrl = function (assetStr) {
+  function resolveDataUrl(assetStr) {
     var hash, resolvedPath, assetUrl;
 
     assetUrl = url.parse(assetStr);
 
     // Find out where an asset really is
-    resolvedPath = self.resolvePath(assetUrl.pathname);
-
+    resolvedPath = resolvePath(assetUrl.pathname);
 
     hash = hashStore.getHash(resolvedPath);
 
@@ -43,12 +39,12 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
     }
 
     return url.format(assetUrl);
-  };
+  }
 
-  self.matchPath = function (assetPath) {
+  function matchPath(assetPath) {
     var isFound, matchingPath;
 
-    matchingPath = path.join(self.options.basePath, assetPath);
+    matchingPath = path.join(options.basePath, assetPath);
     log('matching path for %s is %s', assetPath, matchingPath);
     isFound = fs.existsSync(matchingPath);
 
@@ -59,32 +55,32 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
     }
 
     return matchingPath;
-  };
+  }
 
-  self.resolvePath = function (pathname) {
+  function resolvePath(pathname) {
     var assetPath = decodeURI(pathname);
     log('assetPath = %o', assetPath);
-    return self.matchPath(assetPath);
-  };
+    return matchPath(assetPath);
+  }
 
-  self.processDecl = function (decl) {
+  function processDecl(decl) {
     if (decl.value && decl.value.indexOf('url(') > -1) {
       var cssUrlString = new CSSUrlString(decl.value);
       log(cssUrlString);
       log(cssUrlString.toString());
 
-      cssUrlString.value = self.resolveDataUrl(cssUrlString.value);
+      cssUrlString.value = resolveDataUrl(cssUrlString.value);
 
       log(cssUrlString.toString());
 
       decl.value = cssUrlString.toString();
     }
-  };
+  }
 
   return function (styles) {
     log('##########  START ###########');
-    log(self.options);
-    styles.eachDecl(self.processDecl);
+    log(options);
+    styles.eachDecl(processDecl);
 
   };
 });
