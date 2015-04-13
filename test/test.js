@@ -12,6 +12,9 @@ var test = function (input, output, opts, done) {
   });
 };
 
+/* global describe */
+/* global it */
+
 describe('postcss-url-hash', function () {
 
   /* Write tests here
