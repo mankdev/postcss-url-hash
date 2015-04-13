@@ -1,5 +1,4 @@
 'use strict';
-var log = console.log.bind(console, 'Url-hash: ');
 
 var postcss = require('postcss');
 var url = require('url');
@@ -8,6 +7,7 @@ var path = require('path');
 var HashStore = require('./lib/hash-store');
 var CSSUrlString = require('./lib/CssUrlString');
 var hashStore = new HashStore();
+var log = function(){};
 
 module.exports = postcss.plugin('postcss-url-hash', function (options) {
   options = options || {};
@@ -20,6 +20,10 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
   } else {
     // Set to an absolute path to the working directory
     options.basePath = process.cwd();
+  }
+
+  if(options.debug){
+    log = console.log.bind(console, 'Url-hash: ');
   }
 
   function resolveDataUrl(assetStr) {
@@ -45,7 +49,7 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
     var isFound, matchingPath;
 
     matchingPath = path.join(options.basePath, assetPath);
-    log('matching path for %s is %s', assetPath, matchingPath);
+    log('matching path for '+assetPath, ' is ', matchingPath);
     isFound = fs.existsSync(matchingPath);
 
     if (!isFound) {
@@ -59,7 +63,7 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
 
   function resolvePath(pathname) {
     var assetPath = decodeURI(pathname);
-    log('assetPath = %o', assetPath);
+    log('assetPath = ', assetPath);
     return matchPath(assetPath);
   }
 
