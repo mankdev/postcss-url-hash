@@ -7,7 +7,8 @@ var path = require('path');
 var HashStore = require('./lib/hash-store');
 var CSSUrlString = require('./lib/CssUrlString');
 var hashStore = new HashStore();
-var log = function(){};
+var log = function () {
+};
 
 module.exports = postcss.plugin('postcss-url-hash', function (options) {
   options = options || {};
@@ -22,7 +23,7 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
     options.basePath = process.cwd();
   }
 
-  if(options.debug){
+  if (options.debug) {
     log = console.log.bind(console, 'Url-hash: ');
   }
 
@@ -30,6 +31,10 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
     var hash, resolvedPath, assetUrl;
 
     assetUrl = url.parse(assetStr);
+
+    if (assetUrl.protocol || assetUrl.host || assetUrl.pathname.indexOf('//') === 0) {
+      return assetStr;
+    }
 
     // Find out where an asset really is
     resolvedPath = resolvePath(assetUrl.pathname);
@@ -49,7 +54,7 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
     var isFound, matchingPath;
 
     matchingPath = path.join(options.basePath, assetPath);
-    log('matching path for '+assetPath, ' is ', matchingPath);
+    log('matching path for ' + assetPath, ' is ', matchingPath);
     isFound = fs.existsSync(matchingPath);
 
     if (!isFound) {
