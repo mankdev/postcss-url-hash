@@ -78,7 +78,12 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
       log(cssUrlString);
       log(cssUrlString.toString());
 
-      cssUrlString.value = resolveDataUrl(cssUrlString.value);
+      try {
+        cssUrlString.value = resolveDataUrl(cssUrlString.value);
+      } catch(e) {
+        if (options.silent) return;
+        throw e;
+      }
 
       log(cssUrlString.toString());
 
