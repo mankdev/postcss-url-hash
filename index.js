@@ -73,7 +73,7 @@ module.exports = postcss.plugin('postcss-url-hash', function (options) {
   }
 
   function processDecl(decl) {
-    if (decl.value && decl.value.indexOf('url(') > -1 && decl.value.indexOf('url(data:') === -1) {
+    if (decl.value && decl.value.indexOf('url(') > -1 && decl.value.indexOf('data:') === -1) {
       var cssUrlString = new CSSUrlString(decl.value);
       log(cssUrlString);
       log(cssUrlString.toString());
